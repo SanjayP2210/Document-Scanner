@@ -172,7 +172,6 @@ export default function EmiratesIdLiveScanner({ extractEmiratesIdDetails,data,se
                 </div>}
 
                 <p className="hint-text">{status}</p>
-                {loading && <p className="loading">Processing…</p>}
 
                 {/* {preview && (
         <div className="preview-box">
