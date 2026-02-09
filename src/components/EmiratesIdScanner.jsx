@@ -94,7 +94,7 @@ export default function EmiratesIdScanner() {
 
             const extracted = extractCardDetails(data.text);
             console.log('extracted text', extracted)
-            setStatus("Scan complete");
+            setStatus("Scan completed");
         } catch (e) {
             console.error(e);
             setStatus("Failed to read Emirates ID");
@@ -275,7 +275,7 @@ export default function EmiratesIdScanner() {
 
                     {data && (
                         <div className="result-card">
-                            <h3>Extracted Details</h3>
+                            <h2>Extracted Details</h2>
                             <p><b>Emirates ID:</b> {data?.emiratesIdNumber || "Not found"}</p>
                             <p><b>Aadhaar Number:</b> {data?.aadhaarNumber || "Not found"}</p>
                             <p><b>Name:</b> {data?.name || "Not found"}</p>

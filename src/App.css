@@ -1,34 +1,23 @@
 /* FULL PAGE CENTER */
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 body {
-  margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f6f9ff, #e9f2ff);
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 h1 {
@@ -46,6 +35,7 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  color: white;
 }
 button:hover {
   border-color: #646cff;
@@ -202,8 +192,8 @@ p {
 
 /* MAIN CARD */
 .scanner-card {
-  width: 100%;
-  max-width: 420px;
+  width: 500px;
+  max-width: 500px;
   background: #ffffff;
   padding: 24px;
   border-radius: 18px;
@@ -329,6 +319,10 @@ p {
   text-align: left;
   font-size: 14px;
 }
+
+ .result-card p{
+  font-size: 16px;
+ }
 
 /* LOADING */
 .loading {
@@ -466,6 +460,10 @@ p {
 
 /* RESPONSIVE ADJUSTMENTS */
 @media (max-width: 480px) {
+
+  .scanner-card {
+    width: 300px;
+  }
   .scanner-box {
     padding: 16px;
   }
@@ -477,4 +475,7 @@ p {
   .details-card {
     font-size: 13px;
   }
-}
+  .result-card p{
+    font-size: 13px;
+  }
+} 
