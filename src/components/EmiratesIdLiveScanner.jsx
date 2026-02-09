@@ -6,7 +6,7 @@ const videoConstraints = {
     facingMode: "environment",
 };
 
-export default function EmiratesIdLiveScanner({ extractEmiratesIdDetails,data,setData }) {
+export default function EmiratesIdLiveScanner({ extractCardDetails,data,setData }) {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
     const scanLockRef = useRef(false);
@@ -126,7 +126,7 @@ export default function EmiratesIdLiveScanner({ extractEmiratesIdDetails,data,se
             const match = text.match(/784-\d{4}-\d{7}-\d/);
 
             if (match) {
-                const details = extractEmiratesIdDetails(text);
+                const details = extractCardDetails(text);
                 setEmiratesData(details);
                 setEmiratesId(match[0]);
                 setStatus("Scan complete ✅");

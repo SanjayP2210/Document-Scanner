@@ -12,9 +12,10 @@
   "dependencies": {
     "jspdf": "^4.1.0",
     "opencv-react-ts": "^0.0.11",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-webcam": "^7.2.0",
+    "reactstrap": "^9.2.3",
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
