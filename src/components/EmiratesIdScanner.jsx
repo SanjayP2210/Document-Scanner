@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Tesseract from "tesseract.js";
 import EmiratesIdLiveScanner from "./EmiratesIdLiveScanner";
 import { Row, Col } from 'reactstrap';
+import EmiratesIDScannerModal from "./EmiratesIDScannerModal";
 
 export default function EmiratesIdScanner() {
     const webcamRef = useRef(null);
@@ -12,6 +13,7 @@ export default function EmiratesIdScanner() {
     const [status, setStatus] = useState("");
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
 
     /* ---------------- MODE SWITCH ---------------- */
     const openUpload = () => {
@@ -23,6 +25,7 @@ export default function EmiratesIdScanner() {
     const openCamera = () => {
         reset();
         setMode("camera");
+        setModalOpen(true);
     };
 
     /* ---------------- FILE UPLOAD ---------------- */
@@ -226,29 +229,39 @@ export default function EmiratesIdScanner() {
     };
 
     return (
-        <Row>
-            <Col md={12}>
-                <div className="scanner-card">
-                    <h2 className="title">Document Scanner</h2>
+        <>
+            <div className="scanner-wrapper">
+                <EmiratesIDScannerModal
+                    modalOpen={modalOpen}
+                    setModalOpen={setModalOpen}
+                    onExtracted={(details) => {
+                        extractCardDetails(details);
+                        setModalOpen(false);
+                    }}
+                />
+                <Row>
+                    <Col md={12}>
+                        <div className="scanner-card">
+                            <h2 className="title">Document Scanner</h2>
 
-                    <div className="action-buttons">
-                        <button onClick={openUpload} className="btn warning">
-                            📂 Upload
-                        </button>
-                        <button onClick={openCamera} className="btn primary">
-                            📷 Capture
-                        </button>
-                    </div>
+                            <div className="action-buttons">
+                                <button onClick={openUpload} className="btn warning">
+                                    📂 Upload
+                                </button>
+                                <button onClick={openCamera} className="btn primary">
+                                    📷 Capture
+                                </button>
+                            </div>
 
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        onChange={handleUpload}
-                    />
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                style={{ display: "none" }}
+                                onChange={handleUpload}
+                            />
 
-                    {/* {mode === "camera" && <> <Webcam 
+                            {/* {mode === "camera" && <> <Webcam 
                         ref={webcamRef}
                         audio={false}
                         screenshotFormat="image/jpeg"
@@ -259,35 +272,40 @@ export default function EmiratesIdScanner() {
                     </button> 
                     </>
                 } */}
-                    {mode === "camera" && <EmiratesIdLiveScanner
+                            {/* {mode === "camera" && 
+                    <EmiratesIdLiveScanner
                         extractCardDetails={extractCardDetails}
                         data={data}
                         setData={setData}
-                    />}
+                    />
+                    } */}
 
-                    {/* {preview && (
+                            {/* {preview && (
                     <div className="preview-box">
                         <img src={preview} alt="Preview" />
                     </div>
                 )} */}
 
-                    {status && <p className="status">{status}</p>}
+                            {status && <p className="status">{status}</p>}
 
-                    {data && (
-                        <div className="result-card">
-                            <h2>Extracted Details</h2>
-                            <p><b>Emirates ID:</b> {data?.emiratesIdNumber || "Not found"}</p>
-                            <p><b>Aadhaar Number:</b> {data?.aadhaarNumber || "Not found"}</p>
-                            <p><b>Name:</b> {data?.name || "Not found"}</p>
-                            <p><b>Nationality:</b> {data?.nationality || "Not found"}</p>
-                            <p><b>Gender:</b> {data?.gender || "Not found"}</p>
-                            <p><b>DOB:</b> {data?.dateOfBirth || "Not found"}</p>
+                            {data && (
+                                <div className="result-card">
+                                    <h4>{data?.emiratesIdNumber ? 'Emirate ID' : 'Adhaar Card'} Details</h4>
+                                    ----------------------
+                                    {data?.emiratesIdNumber && <p><b>Emirates ID:</b> {data?.emiratesIdNumber || "Not found"}</p>}
+                                    {data?.aadhaarNumber && <p><b>Aadhaar Number:</b> {data?.aadhaarNumber || "Not found"}</p>}
+                                    <p><b>Name:</b> {data?.name || "Not found"}</p>
+                                    <p><b>Nationality:</b> {data?.nationality || "Not found"}</p>
+                                    <p><b>Gender:</b> {data?.gender || "Not found"}</p>
+                                    <p><b>DOB:</b> {data?.dateOfBirth || "Not found"}</p>
+                                </div>
+                            )}
+
+                            {loading && <p className="loading">Processing…</p>}
                         </div>
-                    )}
-
-                    {loading && <p className="loading">Processing…</p>}
-                </div>
-            </Col>
-        </Row>
+                    </Col>
+                </Row>
+            </div>
+        </>
     );
 }
