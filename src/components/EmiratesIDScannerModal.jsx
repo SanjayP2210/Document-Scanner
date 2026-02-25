@@ -5,6 +5,11 @@ import { createWorker } from "tesseract.js";
 import { CameraError } from "../Camera/CameraError";
 import CameraLoader from "../Camera/CameraLoader";
 import { IconCircleX, IconCircleXFilled, IconRotateClockwise } from "@tabler/icons-react";
+const FACING_MODE_USER = "user";
+const FACING_MODE_ENVIRONMENT = "environment"
+const videoConstraints = {
+    facingMode: "user"
+};
 
 export default function EmiratesIDScannerModal({
   modalOpen,
@@ -22,6 +27,7 @@ export default function EmiratesIDScannerModal({
   const [cardDetected, setCardDetected] = useState(false);
   const [flash, setFlash] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [facingMode, setFacingMode] = useState(FACING_MODE_USER);
   const [isAligned, setIsAligned] = useState(false);
   const [guideMessage, setGuideMessage] = useState(
     "Place your Emirates ID inside the frame",
@@ -33,6 +39,19 @@ export default function EmiratesIDScannerModal({
   const [isSwitching, setIsSwitching] = useState(false);
   const [fade, setFade] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+      const checkScreen = () => {
+          setIsMobile(window.innerWidth <= 768);
+      };
+
+      checkScreen();
+      window.addEventListener("resize", checkScreen);
+
+      return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
   // -----------------------------
   // INIT OCR WORKER
   // -----------------------------
@@ -79,24 +98,43 @@ export default function EmiratesIDScannerModal({
   // SWITCH CAMERA (SMOOTH)
   // -----------------------------
   const handleSwitchCamera = () => {
-    if (!videoDevices.length) return;
-    setFade(true);
-    setCameraReady(false);
-    setShowScanner(false);
-    setIsSwitching(true);
-    const currentIndex = videoDevices.findIndex(
-      (device) => device.deviceId === selectedDeviceId,
-    );
-    const nextIndex = (currentIndex + 1) % videoDevices.length;
-    setTimeout(() => {
-      setSelectedDeviceId(videoDevices[nextIndex].deviceId);
-      // 🔥 Force Webcam re-mount (VERY IMPORTANT)
-      setWebcamKey((prev) => prev + 1);
-      setFade(false);
-      setIsSwitching(false);
-      setIsBackCamera((prevState) => !prevState);
-    }, 300);
-  };
+        if (!videoDevices.length) return;
+        setFade(true);
+        setCameraReady(false);
+        setShowScanner(false);
+        setIsSwitching(true);
+        if (isMobile) {
+            handleMobileSwitchCamera();
+        } else {
+            const currentIndex = videoDevices.findIndex(
+                (device) => device.deviceId === selectedDeviceId,
+            );
+            const nextIndex = (currentIndex + 1) % videoDevices.length;
+            setTimeout(() => {
+                setSelectedDeviceId(videoDevices[nextIndex].deviceId);
+                // 🔥 Force Webcam re-mount (VERY IMPORTANT)
+                setWebcamKey((prev) => prev + 1);
+                setFade(false);
+                setIsBackCamera((prevState) => !prevState);
+            }, 300);
+        }
+    };
+
+    const handleMobileSwitchCamera = () => {
+        setTimeout(() => {
+            setFacingMode(
+                prevState =>
+                    prevState === FACING_MODE_USER
+                        ? FACING_MODE_ENVIRONMENT
+                        : FACING_MODE_USER
+            );
+            setIsBackCamera((prev) => !prev);
+            setWebcamKey((prev) => prev + 1);
+            setFade(false);
+        }, 300);
+
+    };
+
   // -----------------------------
   // RESET
   // -----------------------------
@@ -148,6 +186,7 @@ export default function EmiratesIDScannerModal({
       console.log("Actual resolution:", video.videoWidth, video.videoHeight);
     }
     setCameraReady(true);
+    setIsSwitching(false);
     initWorker();
   };
   const handleUserMediaError = (error) => {
@@ -227,7 +266,11 @@ export default function EmiratesIDScannerModal({
   return (
     <Modal
       isOpen={modalOpen}
-      toggle={() => setModalOpen(!modalOpen)}
+      toggle={() => {
+        setModalOpen(!modalOpen);
+        setFacingMode("user");
+        setIsBackCamera(true);
+      }}
       fullscreen
       contentClassName="camera-modal-content"
       backdrop="static"
@@ -242,7 +285,11 @@ export default function EmiratesIDScannerModal({
           <IconCircleXFilled
             size={40}
             color="white"
-            onClick={() => setModalOpen(false)}
+            onClick={() => {
+              setModalOpen(false);
+              setFacingMode("user");
+              setIsBackCamera(true);
+            }}
           />
         </div>
 
@@ -273,13 +320,17 @@ export default function EmiratesIDScannerModal({
             ref={webcamRef}
             audio={false}
             screenshotQuality={1}
-            videoConstraints={{
+            videoConstraints={
+            !isMobile ? {
               deviceId: selectedDeviceId
                 ? { exact: selectedDeviceId }
                 : undefined,
               width: { ideal: 1920 },
               height: { ideal: 1080 },
               frameRate: { ideal: 30 },
+            } : {
+              ...videoConstraints,
+              facingMode
             }}
             onUserMedia={handleUserMedia}
             onUserMediaError={handleUserMediaError}
